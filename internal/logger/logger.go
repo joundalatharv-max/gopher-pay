@@ -12,6 +12,8 @@ import (
 type multi struct {
 	infoHandler  slog.Handler
 	errorHandler slog.Handler
+	// also write error-level logs to a file
+	errorFileHandler slog.Handler
 }
 
 func New() *slog.Logger {
@@ -23,19 +25,41 @@ func New() *slog.Logger {
 		Level: slog.LevelError,
 	})
 
+	// Try to open stderr.log for appending; if it fails, continue without file handler
+	var errorFileHandler slog.Handler
+	if f, err := os.OpenFile("stderr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644); err == nil {
+		errorFileHandler = slog.NewTextHandler(f, &slog.HandlerOptions{Level: slog.LevelError})
+	}
+
 	return slog.New(&multi{
-		infoHandler:  infoHandler,
-		errorHandler: errorHandler,
+		infoHandler:      infoHandler,
+		errorHandler:     errorHandler,
+		errorFileHandler: errorFileHandler,
 	})
 }
 
 func (m *multi) Enabled(ctx context.Context, level slog.Level) bool {
-	return true
+	// Only enable if either underlying handler would handle this level
+	if m.infoHandler != nil && m.infoHandler.Enabled(ctx, level) {
+		return true
+	}
+	if m.errorHandler != nil && m.errorHandler.Enabled(ctx, level) {
+		return true
+	}
+	return false
 }
 
 func (m *multi) Handle(ctx context.Context, record slog.Record) error {
 	if record.Level >= slog.LevelError {
-		return m.errorHandler.Handle(ctx, record)
+		// send to stderr
+		if err := m.errorHandler.Handle(ctx, record); err != nil {
+			return err
+		}
+		// also send to file (if configured)
+		if m.errorFileHandler != nil {
+			return m.errorFileHandler.Handle(ctx, record)
+		}
+		return nil
 	}
 	return m.infoHandler.Handle(ctx, record)
 }

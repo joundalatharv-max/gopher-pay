@@ -32,6 +32,11 @@ func (s *WalletService) Transfer(
 		return errors.New("amount must be positive")
 	}
 
+	// Prevent self-transfer
+	if fromAccountNumber == toAccountNumber {
+		return errors.New("cannot transfer to the same account")
+	}
+
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -170,4 +175,24 @@ func (s *WalletService) MarkTransactionCompleted(
 		requestID,
 		"completed",
 	)
+}
+
+// CreateAccount creates a new account via repository
+func (s *WalletService) CreateAccount(ctx context.Context, acc *Account) error {
+	return s.repo.CreateAccount(ctx, acc)
+}
+
+// GetAccountByNumber fetches account by account number
+func (s *WalletService) GetAccountByNumber(ctx context.Context, accountNumber string) (*Account, error) {
+	return s.repo.GetAccountByNumber(ctx, accountNumber)
+}
+
+// UpdateAccount updates an existing account
+func (s *WalletService) UpdateAccount(ctx context.Context, acc *Account) error {
+	return s.repo.UpdateAccount(ctx, acc)
+}
+
+// DeleteAccount deletes an account by account number
+func (s *WalletService) DeleteAccount(ctx context.Context, accountNumber string) error {
+	return s.repo.DeleteAccount(ctx, accountNumber)
 }

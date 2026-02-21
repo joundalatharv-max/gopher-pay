@@ -7,6 +7,7 @@ import (
 
 type ReportRepository interface {
 	GetTransactionsByAccount(ctx context.Context, accountNumber string) (*sql.Rows, error)
+	GetAllTransactions(ctx context.Context) (*sql.Rows, error)
 }
 
 type PostgresReportRepository struct {
@@ -55,4 +56,24 @@ func (r *PostgresReportRepository) GetTransactionsByAccount(
 	`
 
 	return r.db.QueryContext(ctx, query, accountNumber)
+}
+
+func (r *PostgresReportRepository) GetAllTransactions(ctx context.Context) (*sql.Rows, error) {
+
+	query := `
+		SELECT 
+			t.id,
+			f.account_number AS from_account,
+			ta.account_number AS to_account,
+			t.amount,
+			t.status,
+			t.request_id,
+			t.created_at
+		FROM transactions t
+		JOIN accounts f ON t.from_account_id = f.id
+		JOIN accounts ta ON t.to_account_id = ta.id
+		ORDER BY t.created_at ASC
+	`
+
+	return r.db.QueryContext(ctx, query)
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"gopherpay/internal/api"
+	"gopherpay/internal/billing"
 	"gopherpay/internal/config"
 	"gopherpay/internal/db"
 	"gopherpay/internal/logger"
@@ -55,14 +56,24 @@ func main() {
 	pool.Start(ctx, cfg.WorkerCount)
 
 	// =====================================
+	// Initialize billing/report service
+	// =====================================
+	reportRepo := billing.NewPostgresReportRepository(database)
+	reportService := billing.NewReportService(reportRepo)
+
+	// =====================================
 	// Setup HTTP server
 	// =====================================
 	handler := &api.Handler{
-		Pool: pool,
+		Pool:   pool,
+		Wallet: service,
+		Report: reportService,
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/transfer", handler.Transfer)
+	mux.HandleFunc("/accounts", handler.CreateAccount)
+	mux.HandleFunc("/admin/transactions", handler.AdminTransactions)
 
 	server := http.Server{
 		Addr:    cfg.ServerHost + ":" + cfg.ServerPort,

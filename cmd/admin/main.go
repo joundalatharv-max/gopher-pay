@@ -6,14 +6,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-
-	"github.com/google/uuid"
+	"path/filepath"
 
 	"gopherpay/internal/billing"
 	"gopherpay/internal/config"
 	"gopherpay/internal/db"
-	"gopherpay/internal/wallet"
 )
 
 func main() {
@@ -33,10 +30,6 @@ func main() {
 	}
 	defer database.Close()
 
-	// Wallet
-	walletRepo := wallet.NewPostgresRepository(database)
-	walletService := wallet.NewWalletService(database, walletRepo)
-
 	// Billing
 	reportRepo := billing.NewPostgresReportRepository(database)
 	reportService := billing.NewReportService(reportRepo)
@@ -48,50 +41,6 @@ func main() {
 	}
 
 	switch os.Args[1] {
-
-	// ========================================
-	// TRANSFER
-	// ========================================
-
-	case "transfer":
-
-		if len(os.Args) != 5 {
-			fmt.Println("Usage:")
-			fmt.Println("  transfer <fromAccountNumber> <toAccountNumber> <amount>")
-			os.Exit(1)
-		}
-
-		fromAccount := os.Args[2]
-		toAccount := os.Args[3]
-
-		amount, err := strconv.ParseInt(os.Args[4], 10, 64)
-		if err != nil {
-			log.Fatal("Invalid amount")
-		}
-
-		// Validate amount is positive integer (cents)
-		if amount <= 0 {
-			log.Fatal("Amount must be a positive integer (cents)")
-		}
-
-		// Generate request ID
-		requestID := uuid.New().String()
-
-		err = walletService.Transfer(
-			ctx,
-			fromAccount,
-			toAccount,
-			amount,
-			requestID,
-		)
-
-		if err != nil {
-			fmt.Println("Transfer failed:", err)
-			os.Exit(1)
-		}
-
-		fmt.Println("Transfer successful")
-		fmt.Println("RequestID:", requestID)
 
 	// ========================================
 	// REPORT
@@ -112,16 +61,26 @@ func main() {
 			os.Exit(1)
 		}
 
-		filename := *output
+		// Ensure Reports directory exists and write file there
+		outDir := "Reports"
+		if err := os.MkdirAll(outDir, 0o755); err != nil {
+			fmt.Println("failed to create Reports dir:", err)
+			os.Exit(1)
+		}
 
+		filename := *output
 		if filename == "" {
 			filename = fmt.Sprintf("%s_report.csv", *user)
 		}
 
+		// sanitize and place inside Reports directory
+		filename = filepath.Base(filename)
+		fullpath := filepath.Join(outDir, filename)
+
 		err := reportService.GenerateReport(
 			ctx,
 			*user,
-			filename,
+			fullpath,
 		)
 
 		if err != nil {
@@ -129,7 +88,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		fmt.Println("Report generated:", filename)
+		fmt.Println("Report generated:", fullpath)
 
 	// ========================================
 	// UNKNOWN

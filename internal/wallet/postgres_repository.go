@@ -183,3 +183,77 @@ func (r *PostgresRepository) UpdateTransactionStatus(
 
 	return err
 }
+
+// CreateAccount inserts a new account and returns the generated ID
+func (r *PostgresRepository) CreateAccount(
+	ctx context.Context,
+	acc *Account,
+) error {
+
+	query := `
+	INSERT INTO accounts
+	(account_number, name, email, phone, dob, balance, created_at, updated_at)
+	VALUES ($1, $2, $3, $4, $5, $6, now(), now())
+	RETURNING id
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		acc.AccountNumber,
+		acc.Name,
+		acc.Email,
+		acc.Phone,
+		acc.DOB,
+		acc.Balance,
+	).Scan(&acc.ID)
+
+	return err
+}
+
+// UpdateAccount updates an existing account identified by account_number
+func (r *PostgresRepository) UpdateAccount(
+	ctx context.Context,
+	acc *Account,
+) error {
+
+	query := `
+	UPDATE accounts
+	SET name = $1,
+		email = $2,
+		phone = $3,
+		dob = $4,
+		balance = $5,
+		updated_at = now()
+	WHERE account_number = $6
+	RETURNING id
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		acc.Name,
+		acc.Email,
+		acc.Phone,
+		acc.DOB,
+		acc.Balance,
+		acc.AccountNumber,
+	).Scan(&acc.ID)
+
+	return err
+}
+
+// DeleteAccount deletes account row by account_number
+func (r *PostgresRepository) DeleteAccount(
+	ctx context.Context,
+	accountNumber string,
+) error {
+
+	query := `
+	DELETE FROM accounts
+	WHERE account_number = $1
+	`
+
+	_, err := r.db.ExecContext(ctx, query, accountNumber)
+	return err
+}

@@ -45,6 +45,24 @@ type WalletRepository interface {
 		requestID string,
 	) error
 
+	// Create a new account
+	CreateAccount(
+		ctx context.Context,
+		acc *Account,
+	) error
+
+	// Update account
+	UpdateAccount(
+		ctx context.Context,
+		acc *Account,
+	) error
+
+	// Delete account by account number
+	DeleteAccount(
+		ctx context.Context,
+		accountNumber string,
+	) error
+
 	UpdateTransactionStatus(
 		ctx context.Context,
 		requestID string,
