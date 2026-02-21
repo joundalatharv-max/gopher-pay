@@ -1,0 +1,12 @@
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=0
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=1
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=2
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=3
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=6
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=5
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="server started" host=0.0.0.0 port=8080 workers=10
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=4
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=9
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=7
+time=2026-02-21T13:46:21.006+05:30 level=INFO msg="worker started" worker_id=8
+time=2026-02-21T13:47:45.640+05:30 level=INFO msg="transfer completed" request_id=ee4a01a9-d7ff-4e3b-9255-1dfbd814adf7
