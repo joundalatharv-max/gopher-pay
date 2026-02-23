@@ -5,7 +5,16 @@ It focuses on correctness, concurrency safety, and financial data integrity.
 
 The system supports account lifecycle management, asynchronous wallet transfers, transaction auditing, and backpressure handling under high load.
 
----
+--------
+
+Capstone Project Submitted by – Group 2 (Pune)
+  Aditya Chavan
+  Atharva Joundal
+  Ashlesha Pal
+  Kalpesh Gajare
+  Vedant Jeughale
+
+---------
 
 ## Overview
 
