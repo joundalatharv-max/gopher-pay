@@ -8,11 +8,11 @@ The system supports account lifecycle management, asynchronous wallet transfers,
 --------
 
 Capstone Project Submitted by – Group 2 (Pune)
-  Aditya Chavan
-  Atharva Joundal
-  Ashlesha Pal
-  Kalpesh Gajare
-  Vedant Jeughale
+  -Aditya Chavan
+  -Atharv Joundal
+  -Ashlesha Pal
+  -Kalpesh Gajare
+  -Vedant Jeughale
 
 ---------
 
