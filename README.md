@@ -30,6 +30,12 @@ GopherPay is designed as a minimal but realistic fintech backend. It demonstrate
 This project emphasizes clean architecture, testability, and scalability.
 
 ---
+## System Architecture
+
+<img width="8192" height="2154" alt="image" src="https://github.com/user-attachments/assets/e348e34b-ed1a-436c-8b51-8492db789162" />
+
+
+---
 
 ## Tech Stack
 
